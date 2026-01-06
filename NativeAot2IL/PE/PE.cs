@@ -132,10 +132,10 @@ public sealed class PE : Binary
         {
             //Non-virtual addresses for these
             var directoryEntryExports = ReadReadableAtVirtualAddress<PeDirectoryEntryExport>(addrExportTable + peImageBase);
-
-            peExportedFunctionPointers = ReadClassArrayAtVirtualAddress<uint>(directoryEntryExports.RawAddressOfExportTable + peImageBase, directoryEntryExports.NumberOfExports);
-            peExportedFunctionNamePtrs = ReadClassArrayAtVirtualAddress<uint>(directoryEntryExports.RawAddressOfExportNameTable + peImageBase, directoryEntryExports.NumberOfExportNames);
-            peExportedFunctionOrdinals = ReadClassArrayAtVirtualAddress<ushort>(directoryEntryExports.RawAddressOfExportOrdinalTable + peImageBase, directoryEntryExports.NumberOfExportNames); //This uses the name count per MSoft spec
+            
+            peExportedFunctionPointers = ReadUIntArrayAtRawAddress(MapVirtualAddressToRaw(directoryEntryExports.RawAddressOfExportTable + peImageBase), (int)directoryEntryExports.NumberOfExports);
+            peExportedFunctionNamePtrs = ReadUIntArrayAtRawAddress(MapVirtualAddressToRaw(directoryEntryExports.RawAddressOfExportNameTable + peImageBase), (int)directoryEntryExports.NumberOfExportNames);
+            peExportedFunctionOrdinals = ReadUShortArrayAtRawAddress(MapVirtualAddressToRaw(directoryEntryExports.RawAddressOfExportOrdinalTable + peImageBase), (int)directoryEntryExports.NumberOfExportNames); //This uses the name count per MSoft spec
         }
         catch (EndOfStreamException)
         {

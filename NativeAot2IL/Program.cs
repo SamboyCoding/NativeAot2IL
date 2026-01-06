@@ -1,4 +1,5 @@
 ﻿using NativeAot2IL.Logging;
+using NativeAot2IL.Metadata;
 using NativeAot2IL.Rtr;
 
 namespace NativeAot2IL;
@@ -31,9 +32,28 @@ internal static class Program
         var header = pe.ReadReadableAtVirtualAddress<ReadyToRunDirectory>(headerAddr);
         Logger.InfoNewline($"Found ReadyToRun header at virtual address: 0x{headerAddr:X}", "Main");
         
-        foreach (var headerSection in header.Sections)
+        foreach (var headerSection in header.Sections!)
         {
             Logger.InfoNewline($"Section: {headerSection.SectionType}, Start: 0x{headerSection.Start:x8}, End: 0x{headerSection.End:x8} (length 0x{(headerSection.End - headerSection.Start):x8}), Flags: {headerSection.Flags}", "Main");
+        }
+
+        var metadataSection = header.Sections.Single(s => s.SectionType == RtrSectionType.EmbeddedMetadata);
+
+        var start = pe.MapVirtualAddressToRaw(metadataSection.Start);
+        var end = pe.MapVirtualAddressToRaw(metadataSection.End);
+        
+        var metadataBytes = new byte[end - start];
+        pe.GetRawBinaryContent().AsSpan((int)start, (int)(end - start)).CopyTo(metadataBytes);
+        
+        using var metadataStream = new MemoryStream(metadataBytes, 0, metadataBytes.Length, true, true);
+        using var metadataReader = new ClassReadingBinaryReader(metadataStream);
+        
+        var metadataHeader = pe.ReadReadableAtVirtualAddress<MetadataHeader>(metadataSection.Start);
+        
+        foreach (var scopeDefinitionHandle in metadataHeader.ScopeDefinitionHandles)
+        {
+            var scopeDefinition = scopeDefinitionHandle.Resolve<ScopeDefinition>(metadataReader);
+            Logger.InfoNewline($"Scope Definition: {scopeDefinition}", "Main");
         }
     }
 }
