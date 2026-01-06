@@ -38,7 +38,7 @@ public class TypeDefinition : ReadableClass
         
         Size = reader.ReadCompressedUIntHereNoLock();
         PackingSize = (ushort)reader.ReadCompressedUIntHereNoLock();
-        EnclosingType = reader.ReadMetadataHandleHereNoLock(HandleType.Null); //One of three possible types so we pass null and it reads differently
+        EnclosingType = reader.ReadMetadataHandleHereNoLock(HandleType.TypeDefinition);
         NestedTypes = reader.ReadMetadataHandleArrayHereNoLock(HandleType.TypeDefinition);
         Methods = reader.ReadMetadataHandleArrayHereNoLock(HandleType.Method);
         Fields = reader.ReadMetadataHandleArrayHereNoLock(HandleType.Field);
