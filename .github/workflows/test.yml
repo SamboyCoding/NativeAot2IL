@@ -1,0 +1,25 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+      
+      - name: Build NativeAot2IL
+        run: dotnet build NativeAot2IL -c Release
+      
+      - name: Publish TestApp (AOT)
+        run: dotnet publish NativeAot2IL.TestApp -c Release
+      
+      - name: Run NativeAot2IL against TestApp
+        run: bin\Release\NativeAot2IL.exe bin\Release\win-x64\native\NativeAot2IL.TestApp.exe
