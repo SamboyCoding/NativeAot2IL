@@ -2,5 +2,6 @@
   <Folder Name="/Solution Items/">
     <File Path="README.md" />
   </Folder>
+  <Project Path="NativeAot2IL.TestApp/NativeAot2IL.TestApp.csproj" />
   <Project Path="NativeAot2IL/NativeAot2IL.csproj" />
 </Solution>
